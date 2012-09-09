@@ -26,7 +26,7 @@ class dict2rss:
 		self.link = ""
 		self.language = "en"
 		self.description = "a mapped dict2rss"
-		self.itemio = StringIO()
+		self.item = ""
 
 		for key in dict:
 			element = dict[key]
@@ -38,21 +38,19 @@ class dict2rss:
 			elif 'dict' in str(type(element)) and key == 'item':
 				"""Parse Items to XML-valid Data"""
 
-				sys.stdout = self.itemio
 				for child in dict[key]:
-					print(u'\t\t<item>')
+					self.item = self.item + u'\t\t<item>'
 					for childchild in dict[key][child]:
 						if childchild == "comment":
-							print(u"\t\t\t<!-- %s -->" % (dict[key][child][childchild]))
+							self.item = self.item + u"\t\t\t<!-- %s -->" % (dict[key][child][childchild])
 						else:
 							try:
 								if childchild in dict['cdata']:
-									print(u'\t\t\t<%s><![CDATA[%s]]></%s>'  % (childchild, cgi.escape(dict[key][child][childchild]), childchild))
+									self.item = self.item + (u'\t\t\t<%s><![CDATA[%s]]></%s>'  % (childchild, cgi.escape(dict[key][child][childchild]), childchild))
 								else: 
-									print(u'\t\t\t<%s>%s</%s>'  % (childchild, cgi.escape(dict[key][child][childchild]), childchild))
-							except: print(u'\t\t\t<%s>%s</%s>'  % (childchild, cgi.escape(dict[key][child][childchild]), childchild))
-					print(u'\t\t</item>')
-				sys.stdout = sys.__stdout__
+									self.item = self.item + (u'\t\t\t<%s>%s</%s>'  % (childchild, cgi.escape(dict[key][child][childchild]), childchild))
+							except: self.item = self.item + (u'\t\t\t<%s>%s</%s>'  % (childchild, cgi.escape(dict[key][child][childchild]), childchild))
+					self.item = self.item + u'\t\t</item>'
 
 	def PrettyPrint(self):
 		print(self._out())
@@ -74,7 +72,7 @@ class dict2rss:
 		d += ('\t\t<link>%s</link>\n' % self.link)
 		d += ('\t\t<description>%s</description>\n' % self.description)
 		d += ('\t\t<language>%s</language>\n' % self.language)
-		d += self.itemio.getvalue()
+		d += self.item
 		d += '\t</channel>\n'
 		d += '</rss>'
 		return d.encode('utf-8')
