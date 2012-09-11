@@ -22,6 +22,7 @@ class MainPage(webapp2.RequestHandler):
 		    address = e.title.replace('Te koop:', '')
 		    convertedEntries[e.title] = {
 		        'title': e.title,
+                'link': e.link,
 		        'description': e.summary + '<img src="%s" title="Map"/>' % (mapUrlPattern % (address, address)),
 		    }
 		my_feed_data = {
